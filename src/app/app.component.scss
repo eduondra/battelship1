@@ -1,0 +1,15 @@
+.border {
+  cursor: pointer;
+  text-align: center;
+  width: 200px;
+  border: solid black 1px;
+  display: flex;
+  height: 150px;
+  justify-content: center;
+}
+
+.center{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
