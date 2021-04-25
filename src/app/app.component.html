@@ -8,9 +8,12 @@
     <button type="btn" class="btn btn-dark" [disabled]="form.invalid">Start</button>
   </form>
   <div class="center d-flex flex-row flex-wrap" style="width: 100vw;" *ngSwitchCase="true">
-    <div *ngFor="let position of game" class="border border-dark" (click)="turn(position)">
-      <span class="center" *ngIf="position.stav" >{{position.statusPole}}</span>
-    </div>
+    <div *ngFor="let position of FieldShip">
+      <div *ngFor="let krakonos of position" class="border border-dark" (click)="turn(krakonos)">
+        <span class="spot" *ngIf="krakonos.getValue() == ship">lod</span>
+        <span class="spot" *ngIf="krakonos.getValue() == water">voda</span>
+      </div>
+      </div>
   </div>
 </div>
 

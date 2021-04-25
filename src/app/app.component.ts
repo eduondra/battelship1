@@ -1,8 +1,28 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
+import {Value} from "../tileValue";
 
-interface Pole {
-  statusPole: string;
-  stav: boolean;
+
+interface TileValue {
+  getValue(): Value;
+}
+
+class Pole implements TileValue{
+  value = false;
+  detected = false;
+
+  constructor(ship: boolean) {
+    this.value = ship;
+  }
+
+  getValue(): Value {
+    if (!this.detected){
+      return Value.HIDDEN;
+    } else if (this.value){
+      return Value.SHIP;
+    } else {
+      return Value.WATER;
+    }
+  }
 }
 
 @Component({
@@ -16,22 +36,35 @@ export class AppComponent {
   postitionDefault: Pole | null | undefined;
   countLod = 0;
   countHitLode = 0;
-  game: Pole[] = [
-    {statusPole: 'voda', stav: false}, {statusPole: 'lod', stav: false}, {statusPole: 'voda', stav: false},
-    {statusPole: 'lod', stav: false}, {statusPole: 'lod', stav: false}, {statusPole: 'voda', stav: false},
-    {statusPole: 'voda', stav: false}, {statusPole: 'voda', stav: false}, {statusPole: 'lod', stav: false},
-  ];
+  lode = 6;
 
+  ship = Value.SHIP;
+  water = Value.WATER;
+
+  FieldShip: Pole[][] = [
+    [new Pole(true), new Pole(false),
+      new Pole(true), new Pole(true)],
+
+    [new Pole(false), new Pole(false),
+      new Pole(true), new Pole(false)],
+
+    [new Pole(false), new Pole(true),
+      new Pole(false), new Pole(false)],
+
+    [new Pole(false), new Pole(true),
+      new Pole(false), new Pole(false)],
+  ];
   constructor() {
-    for (let i = 0; i < this.game.length; i++) {
-      if (this.game[i].statusPole === 'lod') {
-        this.countLod++;
-        console.log(this.countLod);
+    for (let i = 0; i < this.FieldShip.length; i++) {
+      for (let y = 0; y < this.FieldShip.length; y++) {
+        if (this.FieldShip[i][y].getValue() === Value.SHIP) {
+          this.countLod++;
+        }
       }
     }
   }
 
-  shuffle(game: Pole[]) {
+  shuffle(game: Pole[][]) {
     let currentIndex = game.length, temporaryValue, randomIndex;
 
     while (0 !== currentIndex) {
@@ -45,38 +78,31 @@ export class AppComponent {
   }
 
   turn(click: Pole): void {
-    if (click.stav === true) {
-      return;
-    }
-    if (this.postitionDefault === null) {
-      click.stav = true;
-      this.postitionDefault = click;
-    } else {
-      if (this.postitionDefault !== click) {
-        click.stav = true;
-        this.postitionDefault = null;
-      }
+    if (click.getValue() === Value.HIDDEN) {
+      (click as Pole).detected = true;
     }
 
-    if (click.statusPole === 'lod') {
+    if (click.getValue() === Value.SHIP) {
       this.countHitLode++;
       console.log(this.countHitLode);
     }
 
-    if (this.countHitLode === this.countLod) {
+    if (this.countHitLode === this.lode) {
       // tslint:disable-next-line:prefer-for-of
-      for (let i = 0; i < this.game.length; i++) {
-        this.postitionDefault = null;
-        this.game[i].stav = false;
+      for (let i = 0; i < this.FieldShip.length; i++) {
+        for (let y = 0; y < this.FieldShip.length; y++) {
+          this.postitionDefault = null;
+          this.FieldShip[i][y].detected = false;
+          this.countHitLode = 0;
+          this.start = false;
+        }
       }
-      this.countHitLode = 0;
-      this.start = false;
     }
   }
 
   submit(): void {
     this.start = true;
-    this.shuffle(this.game);
+    this.shuffle(this.FieldShip);
   }
 
 }
